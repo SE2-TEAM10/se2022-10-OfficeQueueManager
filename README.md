@@ -8,4 +8,4 @@ We choose Flutter, with Dart language, as a Frontend Framework.
 
 ### Backend
 
-We choose Java as the backend language.
+We choose Node.js with Javascript.
