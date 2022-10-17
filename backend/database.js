@@ -2,6 +2,7 @@
 
 const sqlite = require('sqlite3')
 const crypto = require('crypto')
+const dayjs = require('dayjs')
 
 
 class Database {
@@ -95,7 +96,7 @@ class Database {
                                 new Promise((resolve, reject) => {
                                     const sql3 =
                                         'INSERT INTO officer_service(of_id, serv_id, total_queue) VALUES (?, ?, ?)'
-                                    this.db.run(sql,[ row_of.id, row_ser.id, 0,],
+                                    this.db.run(sql, [row_of.id, row_ser.id, 0,],
                                         function (err) {
                                             if (err) return reject('UNAVAILABLE')
                                             if (this.changes > 0) return resolve('SUCCESS')
@@ -147,39 +148,39 @@ class Database {
         })
     } */
 
-/* deleteFilm = (id, userId) => {
-    return new Promise((resolve, reject) => {
-        if (isNaN(id)) return reject('UNPROCESSABLE')
-        const sql = 'DELETE FROM films WHERE id = ? AND user = ?'
-        this.db.run(sql, [id, userId], function (err) {
-            if (err) return reject('UNAVAILABLE')
-            if (this.changes == 0) return reject('NOT_FOUND')
-            else return resolve('SUCCESS')
+    deleteOfficerService = (id_of, id_ser) => {
+        return new Promise((resolve, reject) => {
+            if (isNaN(id)) return reject('UNPROCESSABLE')
+            const sql = 'DELETE FROM officer_service WHERE of_id = ? AND serv_id = ?'
+            this.db.run(sql, [id_of, id_ser], function (err) {
+                if (err) return reject('UNAVAILABLE')
+                if (this.changes == 0) return reject('NOT_FOUND')
+                else return resolve('SUCCESS')
+            })
         })
-    })
-} */
+    }
 
-login = (username, password) => {
-                return new Promise((resolve, reject) => {
-                    const sql = `SELECT * FROM users WHERE email = ?`
-                    this.db.get(sql, [username], (err, row) => {
-                        if (err) {
-                            resolve(false)
-                        } else if (row === undefined) {
-                            resolve(false)
-                        } else {
-                            const user = { id: row.id, username: row.email, name: row.name }
+    login = (username, password) => {
+        return new Promise((resolve, reject) => {
+            const sql = `SELECT * FROM users WHERE email = ?`
+            this.db.get(sql, [username], (err, row) => {
+                if (err) {
+                    resolve(false)
+                } else if (row === undefined) {
+                    resolve(false)
+                } else {
+                    const user = { id: row.id, username: row.email, name: row.name }
 
-                            crypto.scrypt(password, row.salt, 32, function (err, hashedPassword) {
-                                if (err) reject(err)
-                                if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
-                                    resolve(false)
-                                else resolve(user)
-                            })
-                        }
+                    crypto.scrypt(password, row.salt, 32, function (err, hashedPassword) {
+                        if (err) reject(err)
+                        if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
+                            resolve(false)
+                        else resolve(user)
                     })
-                })
-            }
+                }
+            })
+        })
+    }
 }
 
 module.exports = Database
