@@ -162,14 +162,14 @@ class Database {
 
     login = (username, password) => {
         return new Promise((resolve, reject) => {
-            const sql = `SELECT * FROM users WHERE email = ?`
+            const sql = `SELECT * FROM manager WHERE mail = ?`
             this.db.get(sql, [username], (err, row) => {
                 if (err) {
                     resolve(false)
                 } else if (row === undefined) {
                     resolve(false)
                 } else {
-                    const user = { id: row.id, username: row.email, name: row.name }
+                    const user = { id: row.id, username: row.mail, name: row.name }
 
                     crypto.scrypt(password, row.salt, 32, function (err, hashedPassword) {
                         if (err) reject(err)
