@@ -22,8 +22,8 @@ class RestClient {
 
     //await Future.delayed(const Duration(seconds: 2));
 
-    return httpClient.get(
-      Uri.parse('$e$api'),
+    return http.get(
+      Uri.parse('http://localhost:3001/api/officers/'),
       headers: headers,
     );
   }

@@ -78,7 +78,7 @@ class MyHomePage extends StatelessWidget {
                       ),
                     );
                   } else if (snapshot.hasError) {
-                    return Container();
+                    return Text(snapshot.error.toString());
                   } else {
                     return const CircularProgressIndicator();
                   }
