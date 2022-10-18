@@ -2,7 +2,6 @@
 
 const express = require('express');
 const morgan = require('morgan'); // logging middleware
-const { check, validationResult } = require('express-validator'); // validation middleware
 const Database = require('./database.js')
 const db = new Database('./oqm.db')
 const passport = require('passport'); // auth middleware
@@ -52,7 +51,7 @@ const corsOptions = {
   origin: 'http://localhost:3000',
   credentials: true,
 };
-app.use(cors(corsOptions)); // NB: Usare solo per sviluppo e per l'esame! Altrimenti indicare dominio e porta corretti
+app.use(cors(corsOptions));
 
 
 // custom middleware: check if a given request is coming from an authenticated user
@@ -90,22 +89,10 @@ app.post('/api/sessions', function (req, res, next) {
     req.login(user, (err) => {
       if (err)
         return next(err);
-
-      // req.user contains the authenticated user, we send all the user info back
-      // this is coming from userDao.getUser()
       return res.json(req.user);
     });
   })(req, res, next);
 });
-
-// ALTERNATIVE: if we are not interested in sending error messages...
-/*
-app.post('/api/sessions', passport.authenticate('local'), (req,res) => {
-  // If this function gets called, authentication was successful.
-  // `req.user` contains the authenticated user.
-  res.json(req.user);
-});
-*/
 
 // DELETE /sessions/current 
 // logout
@@ -114,7 +101,7 @@ app.delete('/api/sessions/current', (req, res) => {
 });
 
 // GET /sessions/current
-// check whether the user is logged in or not
+// check whether the manager is logged in or not
 app.get('/api/sessions/current', (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json(req.user);
@@ -124,14 +111,13 @@ app.get('/api/sessions/current', (req, res) => {
 });
 
 
-
 /*** OQM APIs ***/
 
 // GET /api/services
 app.get('/api/services',
   /*isLoggedIn,*/
   (req, res) => {
-    Database.getServices()
+    db.getServices()
       .then(services => res.json(services))
       .catch((err) => res.status(500).json(err));
   });
@@ -143,7 +129,7 @@ app.get('/api/service/:id',
   [check('id').isInt()],
   async (req, res) => {
     try {
-      const result = await Database.getService()(req.params.id);
+      const result = await db.getService()(req.params.id);
       if (result.error)
         res.status(404).json(result);
       else
@@ -159,7 +145,7 @@ app.get('/api/officer/:id',
   [check('id').isInt()],
   async (req, res) => {
     try {
-      const result = await Database.getOfficer()(req.params.id);
+      const result = await db.getOfficer()(req.params.id);
       if (result.error)
         res.status(404).json(result);
       else
@@ -191,7 +177,7 @@ app.post('/api/service',
     };
 
     try {
-      const result = await Database.createService(service);
+      const result = await db.createService(service);
       res.json(result);
     } catch (err) {
       res.status(503).json({ error: `Database error during the creation of new service: ${err}` });
@@ -215,7 +201,7 @@ app.post('/api/OfficerService',
     }
 
     try {
-      const result = await Database.createOfficerService(req.body.id_of, req.body.id_ser);
+      const result = await db.createOfficerService(req.body.id_of, req.body.id_ser);
       res.json(result);
     } catch (err) {
       res.status(503).json({ error: `Database error during the creation of new officer service: ${err}` });
@@ -227,7 +213,7 @@ app.post('/api/OfficerService',
 
 /*app.put('/api/OfficerService', async (req, res) => { 
       try {
-          await Database.updateOfficerService(req.body.id_of,req.body.ser);
+          await db.updateOfficerService(req.body.id_of,req.body.ser);
           res.status(200).end();
       }
       catch (err) {
@@ -248,7 +234,7 @@ app.delete('/api/OfficerService',
 ], */
   async (req, res) => {
     try {
-      await Database.deleteOfficerService(req.body.id_of, req.body.id_ser);
+      await db.deleteOfficerService(req.body.id_of, req.body.id_ser);
       res.status(200).json({});
     } catch (err) {
       res.status(503).json({ error: `Database error during the deletion of officer service with of_id ${req.body.id_of} and id_ser ${req.body.id_ser}: ${err} ` });
