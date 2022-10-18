@@ -113,7 +113,7 @@ app.get('/api/sessions/current', (req, res) => {
 
 /*** OQM APIs ***/
 
-// GET /api/services
+// GET /api/services   
 app.get('/api/services',
   /*isLoggedIn,*/
   (req, res) => {
@@ -123,13 +123,13 @@ app.get('/api/services',
   });
 
 
-// GET /api/service/<id>
+// GET /api/service/<id> 
 app.get('/api/service/:id',
   /*isLoggedIn,*/
   [check('id').isInt()],
   async (req, res) => {
     try {
-      const result = await db.getService()(req.params.id);
+      const result = await db.getService(req.params.id);
       if (result.error)
         res.status(404).json(result);
       else
@@ -139,13 +139,22 @@ app.get('/api/service/:id',
     }
   });
 
+// GET /api/officers   
+app.get('/api/officers',
+  /*isLoggedIn,*/
+  (req, res) => {
+    db.getOfficers()
+      .then(officers => res.json(officers))
+      .catch((err) => res.status(500).json(err));
+  });
+
 // GET /api/officer/<id>
 app.get('/api/officer/:id',
   /*isLoggedIn,*/
   [check('id').isInt()],
   async (req, res) => {
     try {
-      const result = await db.getOfficer()(req.params.id);
+      const result = await db.getOfficer(req.params.id);
       if (result.error)
         res.status(404).json(result);
       else
@@ -165,10 +174,10 @@ app.post('/api/service',
   ], */
   async (req, res) => {
 
-    const errors = validationResult(req).formatWith(errorFormatter);
+    /* const errors = validationResult(req).formatWith(errorFormatter);
     if (!errors.isEmpty()) {
       return res.status(422).json({ error: errors.array().join(", ") });
-    }
+    } */
 
     const service = {
       id: req.body.id,
@@ -184,7 +193,14 @@ app.post('/api/service',
     }
   });
 
-
+// GET /api/OfficerService 
+app.get('/api/OfficerService',
+  /*isLoggedIn,*/
+  (req, res) => {
+    db.getOfficerServices()
+      .then(of_ser => res.json(of_ser))
+      .catch((err) => res.status(500).json(err));
+  });
 
 // POST /api/OfficerService
 app.post('/api/OfficerService',
@@ -195,10 +211,10 @@ app.post('/api/OfficerService',
   ], */
   async (req, res) => {
 
-    const errors = validationResult(req).formatWith(errorFormatter);
+    /* const errors = validationResult(req).formatWith(errorFormatter);
     if (!errors.isEmpty()) {
       return res.status(422).json({ error: errors.array().join(", ") });
-    }
+    } */
 
     try {
       const result = await db.createOfficerService(req.body.id_of, req.body.id_ser);

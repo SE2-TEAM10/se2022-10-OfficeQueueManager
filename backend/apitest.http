@@ -1,0 +1,42 @@
+### getServices
+GET http://localhost:3001/api/services/
+
+### getService
+GET http://localhost:3001/api/service/1/
+
+### getServices
+GET http://localhost:3001/api/officers/
+
+### getOfficer
+GET http://localhost:3001/api/officer/1/
+
+### createService
+POST http://localhost:3001/api/service/
+Content-Type: application/json
+
+{
+  "id": 52,
+  "tag_name": "theService",
+  "service_time": "00:23:00"
+}
+
+### getOfficerServices
+GET http://localhost:3001/api/OfficerService/
+
+### createOfficerService
+POST http://localhost:3001/api/OfficerService/
+Content-Type: application/json
+
+{
+  "id_of": 5,
+  "id_ser": 2
+}
+
+### deleteOfficerService
+DELETE http://localhost:3001/api/OfficerService/
+Content-Type: application/json
+
+{
+  "id_of": 5,
+  "id_ser": 2
+}
