@@ -47,11 +47,7 @@ const port = 3001;
 // set-up the middlewares
 app.use(morgan('dev'));
 app.use(express.json());
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  credentials: true,
-};
-app.use(cors(corsOptions));
+app.use(cors());
 
 
 // custom middleware: check if a given request is coming from an authenticated user
