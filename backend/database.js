@@ -62,9 +62,9 @@ class Database {
     //adding a service to the "service" table
     createService = (service) => {
         return new Promise((resolve, reject) => {
-            /* try {
+             try {
                 if (
-                    typeof service.id !== 'int' ||
+                    typeof service.id !== 'number' ||
                     typeof service.tag_name !== 'string' ||
                     typeof service.service_time !== 'string'
                 ) {
@@ -72,7 +72,7 @@ class Database {
                 }
             } catch (e) {
                 return reject('UNAVAILABLE')
-            } */
+            } 
             const sql =
                 'INSERT INTO service (id, tag_name, service_time) VALUES (?, ?, ?)'
             let ser_time = dayjs(service.service_time).format('HH:mm:ss')

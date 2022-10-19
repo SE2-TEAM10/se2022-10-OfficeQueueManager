@@ -9,6 +9,7 @@ const LocalStrategy = require('passport-local').Strategy; // username and passwo
 const session = require('express-session'); // enable sessions
 const cors = require('cors');
 const { check, validationResult, body, param } = require('express-validator'); // validation middleware
+const dayjs = require('dayjs');
 
 
 /*** Set up Passport ***/
@@ -163,17 +164,17 @@ app.get('/api/officer/:id',
 // POST /api/service
 app.post('/api/service',
   /*isLoggedIn,*/
-  /*[
-    check('id').isInt({ min: 1, max: 5 }),
+  [
+    check('id').isInt({ min: 1, max: 100 }),
     check('tag_name').isLength({ min: 1, max:100 }),
-    check('service_time').isLength({ min: 1, max:100 }),
-  ], */
+    check('service_time').notEmpty()
+  ], 
   async (req, res) => {
 
-    /* const errors = validationResult(req).formatWith(errorFormatter);
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ error: errors.array().join(", ") });
-    } */
+    } 
 
     const service = {
       id: req.body.id,
