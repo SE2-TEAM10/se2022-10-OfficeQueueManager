@@ -31,20 +31,30 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
       ),
       home: MyHomePage(client: client),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({
-    required this.client,
-    super.key,
-  });
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.client});
 
   final RestClient client;
+
+  @override
+  State<MyHomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<MyHomePage> {
+  int selectedOfficer = 0;
+
+  void selectOfficer(int id) {
+    setState(() {
+      selectedOfficer = id;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +70,7 @@ class MyHomePage extends StatelessWidget {
           children: [
             Center(
               child: FutureBuilder(
-                future: client.get(api: 'officers'),
+                future: widget.client.get(api: 'officers'),
                 builder: (ctx, snapshot) {
                   if (snapshot.hasData) {
                     final officers = Officers.fromJson(snapshot.data!.body);
@@ -71,9 +81,11 @@ class MyHomePage extends StatelessWidget {
                             .asMap()
                             .entries
                             .map((p) => OfficerListElement(
-                                client: client,
+                                client: widget.client,
                                 index: p.key + 1,
-                                officer: p.value))
+                                officer: p.value,
+                                selectedOfficer: selectedOfficer,
+                                selectOfficer: selectOfficer))
                             .toList(),
                       ),
                     );
@@ -97,31 +109,46 @@ class OfficerListElement extends StatelessWidget {
     required this.client,
     required this.index,
     required this.officer,
+    required this.selectedOfficer,
+    required this.selectOfficer,
     Key? key,
   }) : super(key: key);
 
   final Officer officer;
   final int index;
   final RestClient client;
+  final int selectedOfficer;
+  final Function(int) selectOfficer;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        width: 500,
-        height: 200,
-        child: Card(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: Text(officer.name), //TODO
-              ),
-            ],
+    return InkWell(
+      onTap: () => selectOfficer(index),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+          width: 200,
+          height: 100,
+          child: Card(
+            shape: (selectedOfficer == index)
+                ? const RoundedRectangleBorder(
+                    side: BorderSide(color: Colors.green))
+                : null,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text('${officer.name} ${officer.surname}'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+  /*setState(() {
+      selectedOfficer = id;
+    });
+    */
 }
