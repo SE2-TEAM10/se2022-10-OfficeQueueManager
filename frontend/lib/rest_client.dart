@@ -1,65 +1,71 @@
 import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:requests/requests.dart';
 
 class RestClient {
-  RestClient({
-    required this.httpClient,
-  });
-  final Client httpClient;
+  RestClient();
 
-  Future<http.Response> get({
+  Future<Response> get({
     required String api,
     String? endpoint,
+    Map<String, String>? headers,
   }) async {
     final e = endpoint ?? dotenv.env['ENDPOINT'];
 
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-    };
-
-    //await Future.delayed(const Duration(seconds: 2));
-
-    return http.get(
-      Uri.parse('$e$api'),
-      headers: headers,
+    return Requests.get(
+      '$e$api',
+      withCredentials: true,
+      verify: false,
+      persistCookies: false,
     );
   }
 
-  Future<http.Response> post({
+  Future<Response> post({
     required String api,
     Map<String, dynamic>? body,
     String? endpoint,
   }) async {
     final e = endpoint ?? dotenv.env['ENDPOINT'];
 
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-    };
-
-    return httpClient.post(
-      Uri.parse('$e$api'),
-      headers: headers,
-      body: jsonEncode(body),
+    return Requests.post(
+      '$e$api',
+      bodyEncoding: RequestBodyEncoding.JSON,
+      body: body,
+      withCredentials: true,
+      verify: false,
+      persistCookies: false,
     );
   }
 
-  Future<http.Response> put({
+  Future<Response> delete({
+    required String api,
+    Map<String, dynamic>? body,
+    String? endpoint,
+  }) async {
+    final e = endpoint ?? dotenv.env['ENDPOINT'];
+
+    return Requests.delete(
+      '$e$api',
+      bodyEncoding: RequestBodyEncoding.JSON,
+      body: body,
+      withCredentials: true,
+      verify: false,
+      persistCookies: false,
+    );
+  }
+
+  Future<Response> put({
     required String api,
     required Map<String, dynamic>? body,
     String? endpoint,
   }) async {
     final e = endpoint ?? dotenv.env['ENDPOINT'];
 
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-    };
-
-    return httpClient.put(
-      Uri.parse('$e$api'),
-      headers: headers,
+    return Requests.put(
+      '$e$api',
+      json: true,
       body: jsonEncode(body),
     );
   }

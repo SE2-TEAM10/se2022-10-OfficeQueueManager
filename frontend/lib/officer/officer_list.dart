@@ -7,9 +7,11 @@ class OfficersList extends StatefulWidget {
   const OfficersList({
     super.key,
     required this.client,
+    required this.onSelect,
   });
 
   final RestClient client;
+  final Function(int) onSelect;
 
   @override
   State<OfficersList> createState() => _OfficersListState();
@@ -22,6 +24,7 @@ class _OfficersListState extends State<OfficersList> {
     setState(() {
       selectedOfficer = id;
     });
+    widget.onSelect.call(id);
   }
 
   @override

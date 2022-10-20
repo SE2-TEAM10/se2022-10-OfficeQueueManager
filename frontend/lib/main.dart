@@ -1,13 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:frontend/officer/officer_list.dart';
+import 'package:frontend/pages/home_page.dart';
+import 'package:frontend/pages/login_page.dart';
 import 'package:frontend/rest_client.dart';
-import 'package:http/http.dart';
 
 void main() async {
   await dotenv.load(fileName: "../.env");
-  final httpClient = Client();
-  final client = RestClient(httpClient: httpClient);
+  final client = RestClient();
 
   runApp(
     MyApp(
@@ -16,13 +17,32 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({
     required this.client,
     super.key,
   });
 
   final RestClient client;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var loading = true;
+  var isLogged = false;
+
+  @override
+  void initState() {
+    widget.client.get(api: 'sessions/current').then((value) {
+      setState(() {
+        isLogged = json.decode(value.body)['error'] != null ? false : true;
+        loading = false;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,37 +52,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(client: client),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({
-    super.key,
-    required this.client,
-  });
-
-  final RestClient client;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Services",
-        ),
-      ),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            OfficersList(
-              client: client,
+      home: loading
+          ? const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
             )
-          ],
-        ),
-      ),
+          : isLogged
+              ? MyHomePage(
+                  client: widget.client,
+                )
+              : LoginPage(
+                  client: widget.client,
+                  onLogged: (val) => setState(() => isLogged = val),
+                ),
     );
   }
 }

@@ -48,8 +48,11 @@ const port = 3001;
 // set-up the middlewares
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(cors());
-
+const corsOptions = {
+  origin: 'http://localhost:8000',
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 // custom middleware: check if a given request is coming from an authenticated user
 const isLoggedIn = (req, res, next) => {
@@ -191,10 +194,10 @@ app.post('/api/service',
   });
 
 // GET /api/OfficerService 
-app.get('/api/OfficerService',
+app.get('/api/OfficerService/:id',
   /*isLoggedIn,*/
   (req, res) => {
-    db.getOfficerServices()
+    db.getOfficerServices(req.params.id)
       .then(of_ser => res.json(of_ser))
       .catch((err) => res.status(500).json(err));
   });

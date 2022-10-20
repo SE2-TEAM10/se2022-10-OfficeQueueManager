@@ -91,10 +91,10 @@ class Database {
         })
     }
 
-    getOfficerServices = () => {
+    getOfficerServices = (id_of) => {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT * FROM officer_service'
-            this.db.all(sql, (err, rows) => {
+            const sql = 'SELECT * FROM service, officer_service WHERE service.id = officer_service.serv_id AND officer_service.of_id = ?'
+            this.db.all(sql, [id_of], (err, rows) => {
                 if (err) return reject('INTERNAL')
                 return resolve(rows)
             })
